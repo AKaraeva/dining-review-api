@@ -13,18 +13,6 @@ The restaurant dining review app lets users rate restaurants based on their hand
 -  Score Calculation: The app computes average ratings for each allergy category per restaurant. If no ratings exist, scores remain null. Overall restaurant scores are averages across all categories.
 - Search Functionality: Users can search for restaurants based on allergy ratings, helping them find places that cater well to specific dietary needs.
 
-  
-### Project Objectives
-
-  - Construct a RESTful web API with data persistence using Spring and Spring Data JPA.
-  - Use Spring Initializr to generate the initial Java project.
-  - Configure application properties for specific dependencies, including the H2 embedded database.
-  - Define the entities that comprise this application scenario.
-  - Define the repositories that enable creating, updating, and querying these different entities.
-  - Define the API contracts that will enable this application scenario.
-  - Leverage the convenience of Lombok for reducing boilerplate code.
-  - Use curl to test the API scenarios.
-
 ## Prerequisites
 
   - Java
