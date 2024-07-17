@@ -15,6 +15,9 @@ public class DiningReview {
     @GeneratedValue
     private Long id;
 
+    @Column(name ="APPROVED")
+    private Boolean approved;
+
     @Column(name = "SUBMITTED_BY")
     private String submittedBy;
 
