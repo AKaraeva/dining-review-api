@@ -1,5 +1,6 @@
 package com.example.diningReviewApi.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -7,6 +8,7 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "DINING_REVIEWS")
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Getter
 @Setter
 @NoArgsConstructor
@@ -15,8 +17,8 @@ public class DiningReview {
     @GeneratedValue
     private Long id;
 
-    @Column(name ="APPROVED")
-    private Boolean approved;
+    @Column(name ="STATUS")
+    private Status status;
 
     @Column(name = "SUBMITTED_BY")
     private String submittedBy;

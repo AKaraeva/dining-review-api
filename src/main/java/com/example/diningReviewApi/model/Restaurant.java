@@ -1,6 +1,8 @@
 package com.example.diningReviewApi.model;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -8,6 +10,7 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "RESTAURANTS")
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Getter
 @Setter
 public class Restaurant {
@@ -32,15 +35,19 @@ public class Restaurant {
 
 
     @Column(name = "PEANUT_SCORE", nullable = true)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "#0.00")
     private Double peanutScore;
 
     @Column(name = "EGG_SCORE", nullable = true)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "#0.00")
     private Double eggScore;
 
     @Column(name = "DAIRY_SCORE", nullable = true)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "#0.00")
     private Double dairyScore;
 
     @Column(name = "OVERALL_SCORE", nullable = true)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "#0.00")
     private Double overallScore;
 
     public void setEggScore(Double eggScore) {

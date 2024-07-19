@@ -2,6 +2,7 @@ package com.example.diningReviewApi.controllers;
 
 import com.example.diningReviewApi.model.DiningReview;
 import com.example.diningReviewApi.model.Restaurant;
+import com.example.diningReviewApi.model.Status;
 import com.example.diningReviewApi.repositories.DiningReviewRepository;
 import com.example.diningReviewApi.repositories.UserRepository;
 import org.springframework.http.ResponseEntity;
@@ -13,10 +14,10 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/rewiews")
 public class DiningReviewController {
-    private DiningReviewRepository diningReviewRepository;
-    private UserRepository userRepository;
+    private final DiningReviewRepository diningReviewRepository;
+    private final UserRepository userRepository;
 
-    private RestaurantContoller restaurantContoller;
+    private final RestaurantContoller restaurantContoller;
 
 
     public DiningReviewController(DiningReviewRepository diningReviewRepository, UserRepository userRepository, RestaurantContoller restaurantContoller) {
@@ -29,32 +30,32 @@ public class DiningReviewController {
     public ResponseEntity<?> submitReview(@RequestBody DiningReview diningReview) {
         if (diningReview != null) {
             if (userRepository.existsByDisplayName(diningReview.getSubmittedBy())) {
-                diningReview.setApproved(false);
+                diningReview.setStatus(Status.PENDING);
                 diningReviewRepository.save(diningReview);
                 return ResponseEntity.ok(diningReview);
             } else {
                 return ResponseEntity.badRequest().body("User does not exist");
             }
         }
-        return ResponseEntity.badRequest().body("Invalid review");
+        return ResponseEntity.noContent().build();
     }
 
     //As an admin, I want to get the list of all dining reviews
 // that are pending approval.
-    @GetMapping("/pending")
+    @GetMapping("admin/pending")
     public ResponseEntity<List<DiningReview>> getPendingReviews() {
-        List<DiningReview> pendingReviews = diningReviewRepository.findByApprovedFalse();
+        List<DiningReview> pendingReviews = diningReviewRepository.findByStatus(Status.PENDING);
         return ResponseEntity.ok(pendingReviews);
     }
 
     // Endpoint to approve a review
-    @PutMapping("/approve/{reviewId}")
+    @PutMapping("admin/approve/{reviewId}")
     public ResponseEntity<?> approveReview(@PathVariable Long reviewId) {
         Optional<DiningReview> reviewOptional = diningReviewRepository.findById(reviewId);
         if (reviewOptional.isPresent()) {
             DiningReview review = reviewOptional.get();
-            review.setApproved(true);
-            List<DiningReview> approvedReviewsByRestaurantId = diningReviewRepository.findByRestaurantIdAndApprovedTrue(review.getRestaurantId());
+            review.setStatus(Status.ACCEPTED);
+            List<DiningReview> approvedReviewsByRestaurantId = diningReviewRepository.findByRestaurantIdAndStatus(review.getRestaurantId(), Status.ACCEPTED);
             Restaurant restaurant = this.restaurantContoller.getRestaurantById(review.getRestaurantId());
 
             if (approvedReviewsByRestaurantId.isEmpty()) {
@@ -73,59 +74,49 @@ public class DiningReviewController {
                     return ResponseEntity.ok(review);
                 }
             } else {
-                double score = 0;
+                double score;
                 if (review.getEggScore() != null) {
 
-                    List<DiningReview> eggReview = diningReviewRepository.findByRestaurantIdAndApprovedTrueAndEggScoreNotNull(review.getRestaurantId());
+                    List<DiningReview> eggReview = diningReviewRepository.findByRestaurantIdAndStatusAndEggScoreNotNull(review.getRestaurantId(), Status.ACCEPTED);
                     score = restaurant.getEggScore() + review.getEggScore();
                     double averageEggScore = score / (eggReview.size() + 1);
                     restaurant.setEggScore(averageEggScore);
-                    diningReviewRepository.save(review);
                     return ResponseEntity.ok(review);
                 }
 
                 if (review.getDairyScore() != null) {
-                    List<DiningReview> dairyReview = diningReviewRepository.findByRestaurantIdAndApprovedTrueAndDairyScoreNotNull(review.getRestaurantId());
+                    List<DiningReview> dairyReview = diningReviewRepository.findByRestaurantIdAndStatusAndDairyScoreNotNull(review.getRestaurantId(), Status.ACCEPTED);
                     score = restaurant.getDairyScore() + review.getDairyScore();
                     double averageDairyScore = score / (dairyReview.size() + 1);
                     restaurant.setDairyScore(averageDairyScore);
-                    diningReviewRepository.save(review);
                     return ResponseEntity.ok(review);
                 }
 
                 if (review.getPeanutScore() != null) {
-                    List<DiningReview> peanutReview = diningReviewRepository.findByRestaurantIdAndApprovedTrueAndPeanutScoreNull(review.getRestaurantId());
+                    List<DiningReview> peanutReview = diningReviewRepository.findByRestaurantIdAndStatusAndPeanutScoreNotNull(review.getRestaurantId(), Status.ACCEPTED);
                     score = restaurant.getPeanutScore() + review.getPeanutScore();
                     double averagePeanutScore = score / (peanutReview.size() + 1);
                     restaurant.setPeanutScore(averagePeanutScore);
-                    diningReviewRepository.save(review);
                     return ResponseEntity.ok(review);
                 }
             }
 
         } else {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.noContent().build();
         }
-        return ResponseEntity.notFound().build();
+        return ResponseEntity.noContent().build();
     }
 
     // Endpoint to reject a review
-    @PutMapping("/reject/{reviewId}")
+    @PutMapping("admin/reject/{reviewId}")
     public ResponseEntity<?> rejectReview(@PathVariable Long reviewId) {
         Optional<DiningReview> reviewOptional = diningReviewRepository.findById(reviewId);
         if (reviewOptional.isPresent()) {
             DiningReview review = reviewOptional.get();
-            //review.setApproved(false);
-            diningReviewRepository.delete(review);
+            review.setStatus(Status.REJECTED);
             return ResponseEntity.ok(review);
         } else {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.noContent().build();
         }
-    }
-
-    @GetMapping("/approved/{restaurantId}")
-    public ResponseEntity<List<DiningReview>> getApprovedReviewsForRestaurant(@PathVariable Long restaurantId) {
-        List<DiningReview> approvedReviews = diningReviewRepository.findByRestaurantIdAndApprovedTrue(restaurantId);
-        return ResponseEntity.ok(approvedReviews);
     }
 }

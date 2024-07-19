@@ -33,7 +33,7 @@ public class UserController {
         return null;
     }*/
 
-    @PostMapping
+    @PostMapping("/add")
     public ResponseEntity<?> addUser(@RequestBody User user) {
         if (user == null) {
             return ResponseEntity.badRequest().body("User data is missing");
@@ -45,45 +45,50 @@ public class UserController {
         User savedUser = userRepository.save(user);
         return ResponseEntity.ok(savedUser);
     }
+
     @PutMapping("/{id}")
-    public User updateUserProfile(@PathVariable Integer id, @RequestBody User user) {
+    public ResponseEntity<?> updateUserProfile(@PathVariable Integer id, @RequestBody User user) {
         Optional<User> userOptional = userRepository.findById(id);
         if (userOptional.isPresent()) {
             User userToUpdate = userOptional.get();
             //ignore update display name. It is unique. If user wants to change display name, they need to create a new account
-           if(user.getCity() != null){
-               userToUpdate.setCity(user.getCity());
-           }
-           if(user.getState() != null){
-               userToUpdate.setState(user.getState());
-              }
-           if(user.getZipcode() != null){
-               userToUpdate.setZipcode(user.getZipcode());
-              }
-           if (user.getInterestedInPeanut() != null){
-               userToUpdate.setInterestedInPeanut(user.getInterestedInPeanut());
+            if (user.getCity() != null) {
+                userToUpdate.setCity(user.getCity());
             }
-           if(user.getInterestedInEgg() != null){
-               userToUpdate.setInterestedInEgg(user.getInterestedInEgg());
-              }
-           if(user.getInterestedInDairy() != null){
-               userToUpdate.setInterestedInDairy(user.getInterestedInDairy());
-              }
+            if (user.getState() != null) {
+                userToUpdate.setState(user.getState());
+            }
+            if (user.getZipcode() != null) {
+                userToUpdate.setZipcode(user.getZipcode());
+            }
+            if (user.getInterestedInPeanut() != null) {
+                userToUpdate.setInterestedInPeanut(user.getInterestedInPeanut());
+            }
+            if (user.getInterestedInEgg() != null) {
+                userToUpdate.setInterestedInEgg(user.getInterestedInEgg());
+            }
+            if (user.getInterestedInDairy() != null) {
+                userToUpdate.setInterestedInDairy(user.getInterestedInDairy());
+            }
             userRepository.save(userToUpdate);
-            return userToUpdate;
+            return ResponseEntity.ok().body(userToUpdate);
         }
-        return null;
+        return ResponseEntity.notFound().build();
     }
 
     @GetMapping("/{displayName}")
-    public User getUserByDisplayName(@PathVariable String displayName) {
-        return userRepository.findByDisplayName(displayName);
-    }
+    public ResponseEntity<?> getUserByDisplayName(@PathVariable String displayName) {
+        if (displayName != null) {
+            User user = this.userRepository.findByDisplayName(displayName);
 
-    // In your review submission method
-    public boolean validateUserForReview(String displayName) {
-        // Check if user exists by display name
-        return userRepository.existsByDisplayName(displayName);
+            if (user != null) {
+                return ResponseEntity.ok(user);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        }
+        return ResponseEntity.badRequest().body("Display name is missing");
     }
 }
+
 

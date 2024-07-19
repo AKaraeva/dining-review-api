@@ -1,5 +1,6 @@
 package com.example.diningReviewApi.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,6 +9,7 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "USERS")
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Getter
 @Setter
 @NoArgsConstructor
@@ -16,7 +18,7 @@ public class User {
     @GeneratedValue
     private Long id;
 
-    @Column(name = "DISPLAY_NAME", unique = true)
+    @Column(name = "DISPLAYNAME", unique = true)
     private String displayName;
 
     @Column(name = "CITY")

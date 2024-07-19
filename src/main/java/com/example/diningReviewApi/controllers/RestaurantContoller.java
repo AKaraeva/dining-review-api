@@ -16,7 +16,7 @@ public class RestaurantContoller {
         this.restaurantRepository = restaurantRepository;
     }
 
-    @PostMapping("/add")
+    @PostMapping("admin/add")
     public ResponseEntity <?> addRestaurant(@RequestBody Restaurant restaurant) {
         if (restaurant != null && restaurant.getName() != null && restaurant.getZipcode() != null) {
             /*for (Restaurant r : restaurantRepository.findAll()) {
@@ -48,6 +48,30 @@ public class RestaurantContoller {
         } else {
 
             return null;
+        }
+    }
+
+    @GetMapping("/{zipcode}/{allergyType}")
+    public ResponseEntity<?> getRestaurantByZipcodeAndAllergyType(@PathVariable String zipcode, @PathVariable String allergyType) {
+        if(zipcode == null || allergyType == null){
+            return ResponseEntity.badRequest().body("Zipcode or allergy type is missing");
+        }
+        Optional<Restaurant> restaurantOptional = Optional.empty();
+        switch (allergyType) {
+            case "egg":
+                restaurantOptional = restaurantRepository.findByZipcodeAndEggScoreNotNull(zipcode);
+                break;
+            case "peanut":
+                restaurantOptional = restaurantRepository.findByZipcodeAndPeanutScoreNotNull(zipcode);
+                break;
+            case "dairy":
+                restaurantOptional = restaurantRepository.findByZipcodeAndDairyScoreNotNull(zipcode);
+                break;
+        }
+        if (restaurantOptional.isPresent()) {
+            return ResponseEntity.ok(restaurantOptional.get());
+        } else {
+            return ResponseEntity.notFound().build();
         }
     }
 }
