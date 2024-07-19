@@ -8,4 +8,10 @@ import java.util.List;
 public interface DiningReviewRepository extends CrudRepository<DiningReview, Long>{
 List<DiningReview> findByApprovedFalse();
 List<DiningReview> findByRestaurantIdAndApprovedTrue(Long restaurantId);
+
+List<DiningReview> findByRestaurantIdAndApprovedTrueAndEggScoreNotNull(Long restaurantId);
+
+List<DiningReview> findByRestaurantIdAndApprovedTrueAndPeanutScoreNull(Long restaurantId);
+
+List<DiningReview> findByRestaurantIdAndApprovedTrueAndDairyScoreNotNull(Long restaurantId);
 }

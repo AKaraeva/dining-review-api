@@ -41,13 +41,13 @@ public class RestaurantContoller {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Restaurant> getRestaurantById(@PathVariable Integer id) {
-        Optional<Restaurant> restaurantOptional = restaurantRepository.findById(id);
-        if (restaurantOptional.isPresent()) {
-            return ResponseEntity.ok(restaurantOptional.get());
+    public Restaurant getRestaurantById(@PathVariable Long id) {
+        Restaurant restaurantOptional = restaurantRepository.findById(id);
+        if (restaurantOptional != null) {
+            return restaurantOptional;
         } else {
 
-            return ResponseEntity.notFound().build();
+            return null;
         }
     }
 }

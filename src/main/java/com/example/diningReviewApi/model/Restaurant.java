@@ -43,4 +43,19 @@ public class Restaurant {
     @Column(name = "OVERALL_SCORE", nullable = true)
     private Double overallScore;
 
+    public void setEggScore(Double eggScore) {
+        this.eggScore = eggScore;
+    }
+
+    public void setPeanutScore(Double peanutScore) {
+        this.peanutScore = peanutScore;
+    }
+
+    public void setDairyScore(Double dairyScore) {
+        this.dairyScore = dairyScore;
+    }
+
+    private void setOverallScore() {
+        this.overallScore = (this.dairyScore + this.eggScore + this.peanutScore)/3;
+    }
 }
